@@ -16,7 +16,8 @@
 const unsigned int width = 1280;
 const unsigned int height = 720;
 
-Camera camera(width, height, glm::vec3(0.0f, 1.5f, 10.0f));
+//ustawienie startowej pozycji kamery na srodek pokoju
+Camera camera(width, height, glm::vec3(0.0f, 1.5f, -4.0f));
 
 float vertices[] = {
     // Podloga (rozmiar 5x8)

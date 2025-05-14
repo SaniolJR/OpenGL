@@ -1,11 +1,13 @@
-#include "Camera.h"
+#include "Camera.h"
+
 
 Camera::Camera(int width, int height, glm::vec3 position)
 {
 	Camera::width = width;
 	Camera::height = height;
 	Position = position;
-	Orientation = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - Position);
+	//ustawienie startowej orientacji kamery
+	Orientation = glm::normalize(glm::vec3(0.0f, 0.0f, 5.0f) - Position);
 	//Orientation = glm::vec3(0.0f, 0.0f, -1.0f);
 }
 void Camera::Matrix(Shader& shader, const char* uniform) // Modyfikacja
@@ -99,4 +101,4 @@ void Camera::Inputs(GLFWwindow* window)
 		// Makes sure the next time the camera looks around it doesn’t jump
 		firstClick = true;
 	}
-}
+}
