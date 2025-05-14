@@ -30,6 +30,12 @@ float vertices[] = {
      2.5f, 3.0f, -4.0f,  1.0f, 0.0f,
      2.5f, 3.0f,  4.0f,  1.0f, 1.0f,
     -2.5f, 3.0f,  4.0f,  0.0f, 1.0f,
+    // Sciana przednia
+    -2.5f, 0.0f,  4.0f,  0.0f, 0.0f,
+     2.5f, 0.0f,  4.0f,  1.0f, 0.0f, 
+     2.5f, 3.0f,  4.0f,  1.0f, 1.0f, 
+    -2.5f, 3.0f,  4.0f,  0.0f, 1.0f,
+
     // Sciana tylna
     -2.5f, 0.0f, -4.0f,  0.0f, 0.0f,
      2.5f, 0.0f, -4.0f,  1.0f, 0.0f,
@@ -80,15 +86,16 @@ float vertices[] = {
 unsigned int indices[] = {
     0, 1, 2, 0, 2, 3,       // podloga
     4, 5, 6, 4, 6, 7,       // sufit
-    8, 9,10, 8,10,11,       // tyl
-    12,13,14,12,14,15,     // lewa
-    16,17,18,16,18,19,     // prawa
-    20,21,22,20,22,23,     // drzwi
-    24,25,26,24,26,27,     // lozko
-    28,29,30,28,30,31,     // noga 1
-    32,33,34,32,34,35,     // noga 2
-    36,37,38,36,38,39,     // noga 3
-    40,41,42,40,42,43      // noga 4
+    8, 9,10, 8,10,11,       // przednia
+    12,13,14,12,14,15,      // tyl
+    16,17,18,16,18,19,      // lewa
+    20,21,22,20,22,23,      // prawa
+    24,25,26,24,26,27,      // drzwi
+    28,29,30,28,30,31,      // lozko
+    32,33,34,32,34,35,      // noga 1
+    36,37,38,36,38,39,      // noga 2
+    40,41,42,40,42,43,      // noga 3
+    44,45,46,44,46,47,      // noga 4
 };
 
 
@@ -121,7 +128,7 @@ int main() {
     vao.LinkAttrib(vbo, 1, 2, GL_FLOAT, 5 * sizeof(float), (void*)(3 * sizeof(float)));
     vao.Unbind(); vbo.Unbind(); ebo.Unbind();
 
-    //trzeba sprawdzaæ czy bliki s¹ w RGB czy RGBA - zmiana na RGBA naprawi³a problemy
+    //trzeba sprawdzaæ czy bliki s¹ w RGB czy RGBA - zmiana na RGBA naprawi³a problemygit
     Texture floorTex("floor.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture ceilingTex("ceiling.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture wallTex("wall.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -151,31 +158,35 @@ int main() {
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(6 * sizeof(unsigned int)));
 
-        // tylna
+        // przednia
         wallTex.Bind();
-		wallTex.texUnit(shader, "tex0", 0);
+        wallTex.texUnit(shader, "tex0", 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(12 * sizeof(unsigned int)));
 
-        // lewa
+        // tylna
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(18 * sizeof(unsigned int)));
 
-        // prawa
+        // lewa
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(24 * sizeof(unsigned int)));
 
-        // drzwi
-        doorTex.Bind();
+        // prawa
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(30 * sizeof(unsigned int)));
+
+
+        //drzwi
+        doorTex.Bind();
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(36 * sizeof(unsigned int)));
 
         // ³ó¿ko blat
         bedTex.Bind();
 		bedTex.texUnit(shader, "tex0", 0);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(36 * sizeof(unsigned int)));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(42 * sizeof(unsigned int)));
 
         // nogi ³ó¿ka
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(42 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(48 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(54 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(60 * sizeof(unsigned int)));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(66 * sizeof(unsigned int)));
 
         glfwSwapBuffers(window);
     }
