@@ -6,6 +6,10 @@ Texture::Texture(const char* image, GLenum texType, GLenum slot, GLenum format, 
 	int widthImg, heightImg, numColCh;
 	stbi_set_flip_vertically_on_load(true);
 	unsigned char* bytes = stbi_load(image, &widthImg, &heightImg, &numColCh, 0);
+	if (!bytes)	
+	{
+		std::cout << "Blad ladowania tekstury: " << image << std::endl;
+	}
 
 	glGenTextures(1, &ID);
 	glActiveTexture(slot);

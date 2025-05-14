@@ -141,14 +141,18 @@ int main() {
 
         // pod³oga
         floorTex.Bind();
+        floorTex.texUnit(shader, "tex0", 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(0 * sizeof(unsigned int)));
 
         // sufit
         ceilingTex.Bind();
+        ceilingTex.texUnit(shader, "tex0", 0);
+
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(6 * sizeof(unsigned int)));
 
         // tylna
         wallTex.Bind();
+		wallTex.texUnit(shader, "tex0", 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(12 * sizeof(unsigned int)));
 
         // lewa
@@ -163,6 +167,7 @@ int main() {
 
         // ³ó¿ko blat
         bedTex.Bind();
+		bedTex.texUnit(shader, "tex0", 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(36 * sizeof(unsigned int)));
 
         // nogi ³ó¿ka
