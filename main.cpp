@@ -26,7 +26,11 @@ int main() {
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
 	buildRoom(vertices, indices);
-	buildBed(vertices, indices);
+    //uwaga tutaj jest nieco inny uklad wspolrzednych - tak jakbys narsowa³ sb wykres widz¹c przed kamer¹
+    //x - pozioma, y - pionowa, z - oddalenie
+	buildBed(vertices, indices, 3.99f, 0.f, 2.5f, 1);
+    buildBed(vertices, indices, 3.99f, 0.f, -2.5f, 1);
+
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -105,7 +109,7 @@ int main() {
         doorTex.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(36 * sizeof(unsigned int)));
 
-        // ³ó¿ko blat
+        // ³ó¿ko blat 
         bedTex.Bind();
 		bedTex.texUnit(shader, "tex0", 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(42 * sizeof(unsigned int)));
@@ -115,6 +119,17 @@ int main() {
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(54 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(60 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(66 * sizeof(unsigned int)));
+
+        // ³ó¿ko blat 
+        bedTex.Bind();
+        bedTex.texUnit(shader, "tex0", 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(72 * sizeof(unsigned int)));
+
+        // nogi ³ó¿ka
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(78 * sizeof(unsigned int)));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(84 * sizeof(unsigned int)));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(90 * sizeof(unsigned int)));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(96 * sizeof(unsigned int)));
 
         glfwSwapBuffers(window);
     }
