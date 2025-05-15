@@ -12,6 +12,7 @@
 #include "EBO.h"
 #include "Camera.h"
 #include "Texture.h"
+#include "geometry.h"
 
 const unsigned int width = 1280;
 const unsigned int height = 720;
@@ -19,87 +20,14 @@ const unsigned int height = 720;
 //ustawienie startowej pozycji kamery na srodek pokoju
 Camera camera(width, height, glm::vec3(0.0f, 1.5f, -4.0f));
 
-float vertices[] = {
-    // Podloga (rozmiar 5x8)
-    -2.5f, 0.0f, -4.0f,  0.0f, 0.0f,
-     2.5f, 0.0f, -4.0f,  1.0f, 0.0f,
-     2.5f, 0.0f,  4.0f,  1.0f, 1.0f,
-    -2.5f, 0.0f,  4.0f,  0.0f, 1.0f,
-    // Sufit
-    -2.5f, 3.0f, -4.0f,  0.0f, 0.0f,
-     2.5f, 3.0f, -4.0f,  1.0f, 0.0f,
-     2.5f, 3.0f,  4.0f,  1.0f, 1.0f,
-    -2.5f, 3.0f,  4.0f,  0.0f, 1.0f,
-    // Sciana przednia
-    -2.5f, 0.0f,  4.0f,  0.0f, 0.0f,
-     2.5f, 0.0f,  4.0f,  1.0f, 0.0f, 
-     2.5f, 3.0f,  4.0f,  1.0f, 1.0f, 
-    -2.5f, 3.0f,  4.0f,  0.0f, 1.0f,
-
-    // Sciana tylna
-    -2.5f, 0.0f, -4.0f,  0.0f, 0.0f,
-     2.5f, 0.0f, -4.0f,  1.0f, 0.0f,
-     2.5f, 3.0f, -4.0f,  1.0f, 1.0f,
-    -2.5f, 3.0f, -4.0f,  0.0f, 1.0f,
-    // Sciana lewa
-    -2.5f, 0.0f,  4.0f,  0.0f, 0.0f,
-    -2.5f, 0.0f, -4.0f,  1.0f, 0.0f,
-    -2.5f, 3.0f, -4.0f,  1.0f, 1.0f,
-    -2.5f, 3.0f,  4.0f,  0.0f, 1.0f,
-    // Sciana prawa
-     2.5f, 0.0f, -4.0f,  0.0f, 0.0f,
-     2.5f, 0.0f,  4.0f,  1.0f, 0.0f,
-     2.5f, 3.0f,  4.0f,  1.0f, 1.0f,
-     2.5f, 3.0f, -4.0f,  0.0f, 1.0f,
-     // Drzwi (w scianie tylnej)
-     -0.8f, 0.0f, -4.001f,  0.0f, 0.0f,
-      0.8f, 0.0f, -4.001f,  1.0f, 0.0f,
-      0.8f, 2.2f, -4.001f,  1.0f, 1.0f,
-     -0.8f, 2.2f, -4.001f,  0.0f, 1.0f,
-     // Lozko - blat
-     -1.5f, 0.3f, 1.5f,  0.0f, 0.0f,
-      1.5f, 0.3f, 1.5f,  1.0f, 0.0f,
-      1.5f, 0.3f, 3.5f,  1.0f, 1.0f,
-     -1.5f, 0.3f, 3.5f,  0.0f, 1.0f,
-     // Nogi lozka (4 sztuki)
-     -1.5f, 0.0f, 1.5f,  0.0f, 0.0f,
-     -1.4f, 0.0f, 1.5f,  1.0f, 0.0f,
-     -1.4f, 0.3f, 1.5f,  1.0f, 1.0f,
-     -1.5f, 0.3f, 1.5f,  0.0f, 1.0f,
-
-      1.4f, 0.0f, 1.5f,  0.0f, 0.0f,
-      1.5f, 0.0f, 1.5f,  1.0f, 0.0f,
-      1.5f, 0.3f, 1.5f,  1.0f, 1.0f,
-      1.4f, 0.3f, 1.5f,  0.0f, 1.0f,
-
-     -1.5f, 0.0f, 3.5f,  0.0f, 0.0f,
-     -1.4f, 0.0f, 3.5f,  1.0f, 0.0f,
-     -1.4f, 0.3f, 3.5f,  1.0f, 1.0f,
-     -1.5f, 0.3f, 3.5f,  0.0f, 1.0f,
-
-      1.4f, 0.0f, 3.5f,  0.0f, 0.0f,
-      1.5f, 0.0f, 3.5f,  1.0f, 0.0f,
-      1.5f, 0.3f, 3.5f,  1.0f, 1.0f,
-      1.4f, 0.3f, 3.5f,  0.0f, 1.0f,
-};
-
-unsigned int indices[] = {
-    0, 1, 2, 0, 2, 3,       // podloga
-    4, 5, 6, 4, 6, 7,       // sufit
-    8, 9,10, 8,10,11,       // przednia
-    12,13,14,12,14,15,      // tyl
-    16,17,18,16,18,19,      // lewa
-    20,21,22,20,22,23,      // prawa
-    24,25,26,24,26,27,      // drzwi
-    28,29,30,28,30,31,      // lozko
-    32,33,34,32,34,35,      // noga 1
-    36,37,38,36,38,39,      // noga 2
-    40,41,42,40,42,43,      // noga 3
-    44,45,46,44,46,47,      // noga 4
-};
 
 
 int main() {
+    std::vector<float> vertices;
+    std::vector<unsigned int> indices;
+	buildRoom(vertices, indices);
+	buildBed(vertices, indices);
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -121,8 +49,8 @@ int main() {
     VAO vao;
     vao.Bind();
 
-    VBO vbo(vertices, sizeof(vertices));
-    EBO ebo(indices, sizeof(indices));
+    VBO vbo(vertices.data(), vertices.size() * sizeof(float));
+    EBO ebo(indices.data(), indices.size() * sizeof(unsigned int));
 
     vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 5 * sizeof(float), (void*)0);
     vao.LinkAttrib(vbo, 1, 2, GL_FLOAT, 5 * sizeof(float), (void*)(3 * sizeof(float)));
