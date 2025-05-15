@@ -28,8 +28,8 @@ int main() {
 	buildRoom(vertices, indices);
     //uwaga tutaj jest nieco inny uklad wspolrzednych - tak jakbys narsowa³ sb wykres widz¹c przed kamer¹
     //x - pozioma, y - pionowa, z - oddalenie
-	buildBed(vertices, indices, 3.99f, 0.f, 2.5f, 1);
-    buildBed(vertices, indices, 3.99f, 0.f, -2.5f, 1);
+	buildBed(vertices, indices, 3.61f, 0.f, 2.5f, 1, 1.0f, 0.75f);
+    buildBed(vertices, indices, 3.61f, 0.f, -2.5f, 1, 1.0f, 0.75f);
 
 
     glfwInit();

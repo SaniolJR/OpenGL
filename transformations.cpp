@@ -1,7 +1,7 @@
 #include "transformations.h"
 
-void transformBedVertices(float* verts, int count, float posX, float posY, float posZ, int orientation) {
-    // orientation: 0=0°,1=90°,2=180°,3=270°
+void transformBedVertices(float* verts, int count, float posX, float posY, float posZ, int orientation, float scaleX, float scaleZ) {
+    // orientation: 0=0°, 1=90°, 2=180°, 3=270°
     float angle = orientation * (3.1415926f / 2.0f);
     float cosA = cos(angle);
     float sinA = sin(angle);
@@ -11,7 +11,11 @@ void transformBedVertices(float* verts, int count, float posX, float posY, float
         float y = verts[i * 5 + 1];
         float z = verts[i * 5 + 2];
 
-        // Obrót wokó³ Y
+        // Skalowanie
+        x *= scaleX;
+        z *= scaleZ;
+
+        // Obrót wokó³ osi Y
         float xNew = x * cosA - z * sinA;
         float zNew = x * sinA + z * cosA;
 

@@ -56,7 +56,7 @@ void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds){
 }
 
 
-void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float posX, float posY, float posZ, int orientation) {
+void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float posX, float posY, float posZ, int orientation, float scaleX, float scaleZ) {
     unsigned int liczba_start = verts.size() / 5;
 
     float bed_vert[] = {
@@ -87,7 +87,7 @@ void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float 
          1.4f, 0.3f, 3.5f,  0.0f, 1.0f,
     };
 
-	transformBedVertices(bed_vert, 20, posX, posY, posZ, orientation);
+	transformBedVertices(bed_vert, 20, posX, posY, posZ, orientation, scaleX, scaleZ);
     
     unsigned int bed_ind[] = {
     0,1,2,0,2,3,      // lozko
