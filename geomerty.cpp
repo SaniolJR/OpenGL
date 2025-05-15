@@ -57,6 +57,8 @@ void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds){
 
 
 void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds) {
+    unsigned int liczba_start = verts.size() / 5;
+
     float bed_vert[] = {
         // Lozko - blat
         -1.5f, 0.3f, 1.5f,  0.0f, 0.0f,
@@ -86,12 +88,16 @@ void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds) {
     };
     
     unsigned int bed_ind[] = {
-    28,29,30,28,30,31,      // lozko
-    32,33,34,32,34,35,      // noga 1
-    36,37,38,36,38,39,      // noga 2
-    40,41,42,40,42,43,      // noga 3
-    44,45,46,44,46,47      // noga 4
+    0,1,2,0,2,3,      // lozko
+    4,5,6,4,6,7,      // noga 1
+    8,9,10,8,10,11,      // noga 2
+    12,13,14,12,14,15,      // noga 3
+    16,17,18,16,18,19      // noga 4
     };
+
+    for (int i = 0; i < 30; i++ ) {
+		bed_ind[i] += liczba_start;
+	}
 
     verts.insert(verts.end(), std::begin(bed_vert), std::end(bed_vert));
     inds.insert(inds.end(), std::begin(bed_ind), std::end(bed_ind));
