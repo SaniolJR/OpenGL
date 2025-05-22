@@ -25,40 +25,13 @@ Camera camera(width, height, glm::vec3(0.0f, 1.5f, -4.0f));
 int main() {
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
-    std::vector<float> vertices1;
-    std::vector<unsigned int> indices1;
-	buildRoom(vertices, indices);
+	buildRoomNew(vertices, indices);
     //uwaga tutaj jest nieco inny uklad wspolrzednych - tak jakbys narsowa³ sb wykres widz¹c przed kamer¹
     //x - pozioma, y - pionowa, z - oddalenie
-	buildBed(vertices, indices, 3.61f, 0.f, 2.5f, 1, 1.0f, 0.75f);
-    buildBed(vertices, indices, 3.61f, 0.f, -2.5f, 1, 1.0f, 0.75f);
+	buildBedNew(vertices, indices, 3.61f, 0.f, 2.5f, 1, 1.0f, 0.75f);
+    buildBedNew(vertices, indices, 3.61f, 0.f, -2.5f, 1, 1.0f, 0.75f);
 
 
-    int num = 0;
-    //parseFromObj(vertices, indices, "stol.obj", num); // <- œcie¿ka do twojego pliku
-    parseFromObj(vertices1, indices1, "stol.obj", num); // <- œcie¿ka do twojego pliku
-
-	std::cout << "Vertices from OBJ file:" << std::endl;
-	for (int i = 0; i < vertices1.size(); i += 5) {
-        std::cout << vertices1[i] << " ";
-        std::cout << vertices1[i+1] << " ";
-        std::cout << vertices1[i+2] << " ";
-        std::cout << vertices1[i+3] << " ";
-        std::cout << vertices1[i+4] << std::endl;
-	}
-    std::cout << "Indices from OBJ file:" << std::endl;
-
-    for (int i = 0; i < indices1.size(); i += 6) {
-        std::cout << indices1[i] << " ";
-        std::cout << indices1[i + 1] << " ";
-        std::cout << indices1[i + 2] << " ";
-        std::cout << indices1[i + 3] << " ";
-        std::cout << indices1[i + 4] << " ";
-        std::cout << indices1[i + 5] << std::endl;
-    }
-	std::cout << "Number of indices: " << num << std::endl;
-
-    
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -83,8 +56,11 @@ int main() {
     VBO vbo(vertices.data(), vertices.size() * sizeof(float));
     EBO ebo(indices.data(), indices.size() * sizeof(unsigned int));
 
-    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 5 * sizeof(float), (void*)0);
-    vao.LinkAttrib(vbo, 1, 2, GL_FLOAT, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);               // pozycja
+    vao.LinkAttrib(vbo, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float))); // tekstura
+    vao.LinkAttrib(vbo, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float))); // normalne
+
+
     vao.Unbind(); vbo.Unbind(); ebo.Unbind();
 
     //trzeba sprawdzaæ czy bliki s¹ w RGB czy RGBA - zmiana na RGBA naprawi³a problemygit
@@ -93,27 +69,6 @@ int main() {
     Texture wallTex("wall.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture doorTex("door.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture bedTex("bed.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-	Texture tableTex("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    // po wczytaniu sto³u:
-    VAO vaoTable;
-    VBO vboTable(vertices1.data(), vertices1.size() * sizeof(float));
-    EBO eboTable(indices1.data(), indices1.size() * sizeof(unsigned int));
-
-
-    // po utworzeniu vaoTable, vboTable, eboTable:
-    vaoTable.Bind();
-    vboTable.Bind();
-    eboTable.Bind();
-    // skonfiguruj dok³adnie tak samo jak dla g³ównego VAO:
-    vaoTable.LinkAttrib(vboTable, 0, 3, GL_FLOAT, 5 * sizeof(float), (void*)0);
-    vaoTable.LinkAttrib(vboTable, 1, 2, GL_FLOAT, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-    // odwi¹¿:
-    vaoTable.Unbind();
-    vboTable.Unbind();
-    eboTable.Unbind();
-
-    // skonfiguruj atrybuty tak samo jak dla pokoju
-
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -123,8 +78,30 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.Activate();
-        camera.Matrix(shader, "camMatrix");
+        glm::mat4 model = glm::mat4(1.0f);
+        glm::vec3 lightPos(0.0f, 3.8f, 0.0f); // pozycja lampy
+        glm::vec4 lightColor(1.0f, 1.0f, 0.9f, 1.0f); // lekko ciep³e œwiat³o
+
+        float ka = 0.2f;
+        float kd = 1.0f;
+        float ks = 0.5f;
+        float shininess = 32.0f;
+
+        glUniform1f(glGetUniformLocation(shader.ID, "ka"), ka);
+        glUniform1f(glGetUniformLocation(shader.ID, "kd"), kd);
+        glUniform1f(glGetUniformLocation(shader.ID, "ks"), ks);
+        glUniform1f(glGetUniformLocation(shader.ID, "shininess"), shininess);
+
+        glUniform4f(glGetUniformLocation(shader.ID, "lightColor"), lightColor.r, lightColor.g, lightColor.b, lightColor.a);
+        glUniform3f(glGetUniformLocation(shader.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+        glUniform3f(glGetUniformLocation(shader.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
+
+        glUniformMatrix4fv(glGetUniformLocation(shader.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
         camera.updateMatrix(45.0f, 0.1f, 100.0f);
+        camera.Matrix(shader, "camMatrix");
+
+        
         vao.Bind();
 
         // pod³oga
@@ -137,7 +114,7 @@ int main() {
         ceilingTex.texUnit(shader, "tex0", 0);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(6 * sizeof(unsigned int)));
-
+        
         // przednia
         wallTex.Bind();
         wallTex.texUnit(shader, "tex0", 0);
@@ -174,14 +151,10 @@ int main() {
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(72 * sizeof(unsigned int)));
 
         // nogi ³ó¿ka
-        
-        glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_INT, (void*)(96 * sizeof(unsigned int)));
-        
-        //stol
-        vaoTable.Bind();
-        tableTex.Bind(); tableTex.texUnit(shader, "tex0", 0);
-        glDrawElements(GL_TRIANGLES, indices1.size(), GL_UNSIGNED_INT, 0);
-
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(78 * sizeof(unsigned int)));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(84 * sizeof(unsigned int)));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(90 * sizeof(unsigned int)));
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(96 * sizeof(unsigned int)));
 
         glfwSwapBuffers(window);
     }
