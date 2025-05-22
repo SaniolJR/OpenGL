@@ -104,4 +104,119 @@ void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float 
     verts.insert(verts.end(), std::begin(bed_vert), std::end(bed_vert));
     inds.insert(inds.end(), std::begin(bed_ind), std::end(bed_ind));
 }
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+#include <map>
+#include <tuple>
+#include <cstdlib>
+
+void readValues(int i, std::string line, std::vector<float>& vec) {
+    std::string val;
+
+    while (i < line.size()) {
+        if (line[i] != ' ') {
+            val += line[i];
+        }
+        else {
+            if (!val.empty()) {
+                vec.push_back(std::stof(val));
+                val.clear();
+            }
+        }
+        i++;
+    }
+
+    if (!val.empty()) {
+        vec.push_back(std::stof(val));
+    }
+}
+
+
+void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, const std::string& path, int& num_of_inds) {
+    std::ifstream in(path, std::ios::in);
+    if (!in) {
+        std::cerr << "Cannot open " << path << std::endl;
+        std::exit(1);
+    }
+
+    std::vector<float> positions;
+    std::vector<float> texcoords;
+    std::vector<float> normals;
+    int vertOffset = verts.size() / 5; // ile ju¿ by³o verteksów
+    int startVertOffset = vertOffset;
+
+
+    std::string line;
+
+    while (std::getline(in, line)) {
+
+        std::string type;
+        //zczytanie do pierwszej spacji w linii - typ
+        int i = 0;
+		while (line[i] != ' ' && line[i] != '\0') {
+			type += line[i];
+            i++;
+		}
+        i++; // przeskoczenie aktualnej spacji
+        if (type == "v") {
+            readValues(i, line, positions);
+        }
+        else if (type == "vt") {
+			readValues(i, line, texcoords);
+        }
+        else if (type == "vn") {
+			readValues(i, line, normals);
+        }
+        else if (type == "f") {
+            for (int v = 0; v < 3; v++) { // zak³adamy trójk¹ty
+                std::string val = "";
+                int posIdx = 0, texIdx = 0, normIdx = 0;
+                int valIdx = 0;
+
+                while (line[i] != ' ' && line[i] != '\0') {
+                    if (line[i] != '/') {
+                        val += line[i];
+                    }
+                    else {
+                        if (valIdx == 0) posIdx = std::stoi(val);
+                        else if (valIdx == 1) texIdx = std::stoi(val);
+                        val = "";
+                        valIdx++;
+                    }
+                    i++;
+                }
+                // ostatnia wartoœæ (normals)
+                if (!val.empty()) normIdx = std::stoi(val);
+
+                posIdx--; texIdx--; // indeksy od 1 w .obj, u nas od 0
+
+                // dodajemy pozycje (3 floaty)
+                verts.push_back(positions[posIdx * 3 + 0]);
+                verts.push_back(positions[posIdx * 3 + 1]);
+                verts.push_back(positions[posIdx * 3 + 2]);
+
+                // dodajemy tekstury (2 floaty)
+                verts.push_back(texcoords[texIdx * 2 + 0]);
+                verts.push_back(texcoords[texIdx * 2 + 1]);
+
+                // dodawanie normals
+                /*
+                verts.push_back(normals[normIdx * 3 + 0]);
+                verts.push_back(normals[normIdx * 3 + 1]);
+                verts.push_back(normals[normIdx * 3 + 2]);
+                */
+
+                // liczba vertexów to verts.size() / 5 (bo ka¿dy vertex to 5 floatów)
+                inds.push_back(vertOffset++);
+
+                // przeskocz spacjê jeœli jest
+                if (line[i] == ' ') i++;
+            }
+        }
+    }
+    num_of_inds = vertOffset - startVertOffset;
+}
 
