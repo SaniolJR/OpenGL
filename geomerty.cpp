@@ -204,11 +204,10 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
                 verts.push_back(texcoords[texIdx * 2 + 1]);
 
                 // dodawanie normals
-                /*
                 verts.push_back(normals[normIdx * 3 + 0]);
                 verts.push_back(normals[normIdx * 3 + 1]);
                 verts.push_back(normals[normIdx * 3 + 2]);
-                */
+                
 
                 // liczba vertexów to verts.size() / 5 (bo ka¿dy vertex to 5 floatów)
                 inds.push_back(vertOffset++);
