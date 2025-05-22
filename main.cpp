@@ -1,4 +1,4 @@
-#include <iostream>
+ï»¿#include <iostream>
 #include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -25,11 +25,16 @@ Camera camera(width, height, glm::vec3(0.0f, 1.5f, -4.0f));
 int main() {
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
-	buildRoomNew(vertices, indices);
-    //uwaga tutaj jest nieco inny uklad wspolrzednych - tak jakbys narsowa³ sb wykres widz¹c przed kamer¹
+    std::vector<float> verticesStol;
+    std::vector<unsigned int> indicesStol;
+	buildRoom(vertices, indices);
+       
+    //uwaga tutaj jest nieco inny uklad wspolrzednych - tak jakbys narsowaÂ³ sb wykres widzÂ¹c przed kamerÂ¹
     //x - pozioma, y - pionowa, z - oddalenie
-	buildBedNew(vertices, indices, 3.61f, 0.f, 2.5f, 1, 1.0f, 0.75f);
-    buildBedNew(vertices, indices, 3.61f, 0.f, -2.5f, 1, 1.0f, 0.75f);
+    //uwaga tutaj jest nieco inny uklad wspolrzednych - tak jakbys narsowaÅ‚ sb wykres widzÄ…c przed kamerÄ…
+    //x - pozioma, y - pionowa, z - oddalenie
+	buildBed(vertices, indices, 3.61f, 0.f, 2.5f, 1, 1.0f, 0.75f);
+    buildBed(vertices, indices, 3.61f, 0.f, -2.5f, 1, 1.0f, 0.75f);
 
 
     glfwInit();
@@ -49,6 +54,7 @@ int main() {
     glViewport(0, 0, width, height);
     glEnable(GL_DEPTH_TEST);
 
+    //------------------------pokoj
     Shader shader("default.vert", "default.frag");
     VAO vao;
     vao.Bind();
@@ -63,12 +69,35 @@ int main() {
 
     vao.Unbind(); vbo.Unbind(); ebo.Unbind();
 
-    //trzeba sprawdzaæ czy bliki s¹ w RGB czy RGBA - zmiana na RGBA naprawi³a problemygit
+
+    //------------------------stol
+    int inds_stol_liczba = 0;
+    parseFromObj(verticesStol, indicesStol, "stol.obj", inds_stol_liczba);
+    VAO vaoTable;
+    VBO vboTable(verticesStol.data(), verticesStol.size() * sizeof(float));
+    EBO eboTable(indicesStol.data(), indicesStol.size() * sizeof(unsigned int));
+
+    vaoTable.Bind();
+    vboTable.Bind();
+    eboTable.Bind();
+    vaoTable.LinkAttrib(vboTable, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);              // pos
+    vaoTable.LinkAttrib(vboTable, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    vaoTable.LinkAttrib(vboTable, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float))); // normals
+
+    vaoTable.Unbind();
+    vboTable.Unbind();
+    eboTable.Unbind();
+
+
+    //------------------------ladowanie tekstur
+    //trzeba sprawdzaÄ‡ czy bliki sÄ… w RGB czy RGBA - zmiana na RGBA naprawiÅ‚a problemygit
     Texture floorTex("floor.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture ceilingTex("ceiling.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture wallTex("wall.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture doorTex("door.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture bedTex("bed.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+   	Texture tableTex("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -80,7 +109,7 @@ int main() {
         shader.Activate();
         glm::mat4 model = glm::mat4(1.0f);
         glm::vec3 lightPos(0.0f, 3.8f, 0.0f); // pozycja lampy
-        glm::vec4 lightColor(1.0f, 1.0f, 0.9f, 1.0f); // lekko ciep³e œwiat³o
+        glm::vec4 lightColor(1.0f, 1.0f, 0.9f, 1.0f); // lekko ciepÅ‚e Å›wiatÅ‚o
 
         float ka = 0.2f;
         float kd = 1.0f;
@@ -104,7 +133,7 @@ int main() {
         
         vao.Bind();
 
-        // pod³oga
+        // podÅ‚oga
         floorTex.Bind();
         floorTex.texUnit(shader, "tex0", 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(0 * sizeof(unsigned int)));
@@ -134,27 +163,36 @@ int main() {
         doorTex.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(36 * sizeof(unsigned int)));
 
-        // ³ó¿ko blat 
+        // Å‚Ã³Å¼ko blat 
         bedTex.Bind();
 		bedTex.texUnit(shader, "tex0", 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(42 * sizeof(unsigned int)));
 
-        // nogi ³ó¿ka
+        // nogi Å‚Ã³Å¼ka
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(48 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(54 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(60 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(66 * sizeof(unsigned int)));
 
-        // ³ó¿ko blat 
+        // Å‚Ã³Å¼ko blat 
         bedTex.Bind();
         bedTex.texUnit(shader, "tex0", 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(72 * sizeof(unsigned int)));
 
-        // nogi ³ó¿ka
+        // nogi Å‚Ã³Å¼ka
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(78 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(84 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(90 * sizeof(unsigned int)));
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(96 * sizeof(unsigned int)));
+
+        //stol
+        vaoTable.Bind();
+        tableTex.Bind(); tableTex.texUnit(shader, "tex0", 0);
+        glUniform1f(glGetUniformLocation(shader.ID, "kd"), 1.0f);
+        glUniform1f(glGetUniformLocation(shader.ID, "ks"), 0.0f);
+        glUniform3f(glGetUniformLocation(shader.ID, "lightPos"), 0, 0, 0);
+
+        glDrawElements(GL_TRIANGLES, indicesStol.size(), GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
     }
