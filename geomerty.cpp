@@ -1,60 +1,5 @@
 ﻿#include "geometry.h"
 
-void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds){
-    float pokoj_vert[] = {
-        // Podloga (rozmiar 5x8)
-   -2.5f, 0.0f, -4.0f,  0.0f, 0.0f,
-    2.5f, 0.0f, -4.0f,  1.0f, 0.0f,
-    2.5f, 0.0f,  4.0f,  1.0f, 1.0f,
-   -2.5f, 0.0f,  4.0f,  0.0f, 1.0f,
-   // Sufit
-   -2.5f, 3.0f, -4.0f,  0.0f, 0.0f,
-    2.5f, 3.0f, -4.0f,  1.0f, 0.0f,
-    2.5f, 3.0f,  4.0f,  1.0f, 1.0f,
-   -2.5f, 3.0f,  4.0f,  0.0f, 1.0f,
-   // Sciana przednia
-   -2.5f, 0.0f,  4.0f,  0.0f, 0.0f,
-    2.5f, 0.0f,  4.0f,  1.0f, 0.0f,
-    2.5f, 3.0f,  4.0f,  1.0f, 1.0f,
-   -2.5f, 3.0f,  4.0f,  0.0f, 1.0f,
-
-   // Sciana tylna
-   -2.5f, 0.0f, -4.0f,  0.0f, 0.0f,
-    2.5f, 0.0f, -4.0f,  1.0f, 0.0f,
-    2.5f, 3.0f, -4.0f,  1.0f, 1.0f,
-   -2.5f, 3.0f, -4.0f,  0.0f, 1.0f,
-   // Sciana lewa
-   -2.5f, 0.0f,  4.0f,  0.0f, 0.0f,
-   -2.5f, 0.0f, -4.0f,  1.0f, 0.0f,
-   -2.5f, 3.0f, -4.0f,  1.0f, 1.0f,
-   -2.5f, 3.0f,  4.0f,  0.0f, 1.0f,
-   // Sciana prawa
-    2.5f, 0.0f, -4.0f,  0.0f, 0.0f,
-    2.5f, 0.0f,  4.0f,  1.0f, 0.0f,
-    2.5f, 3.0f,  4.0f,  1.0f, 1.0f,
-    2.5f, 3.0f, -4.0f,  0.0f, 1.0f,
-    // Drzwi (w scianie tylnej)
-    -0.8f, 0.0f, -4.001f,  0.0f, 0.0f,
-     0.8f, 0.0f, -4.001f,  1.0f, 0.0f,
-     0.8f, 2.2f, -4.001f,  1.0f, 1.0f,
-    -0.8f, 2.2f, -4.001f,  0.0f, 1.0f
-    };
-
-    unsigned int pokoj_ind[] = {
-    0, 1, 2, 0, 2, 3,       // podloga
-    4, 5, 6, 4, 6, 7,       // sufit
-    8, 9,10, 8,10,11,       // przednia
-    12,13,14,12,14,15,      // tyl
-    16,17,18,16,18,19,      // lewa
-    20,21,22,20,22,23,      // prawa
-    24,25,26,24,26,27,      // drzwi
-    };
-    //dokładamy do wektora
-    verts.insert(verts.end(), std::begin(pokoj_vert), std::end(pokoj_vert));
-	inds.insert(inds.end(), std::begin(pokoj_ind), std::end(pokoj_ind));
-
-}
-
 
 void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float posX, float posY, float posZ, int orientation, float scaleX, float scaleZ) {
     unsigned int liczba_start = verts.size() / 5;
@@ -169,7 +114,7 @@ void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds) {
    
 }
 
-void buildBedNew(std::vector<float>& verts, std::vector<unsigned int>& inds, float posX, float posY, float posZ, int orientation, float scaleX, float scaleZ) {
+void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float posX, float posY, float posZ, int orientation, float scaleX, float scaleZ) {
     unsigned int liczba_start = verts.size() / 8;
 
     float bed_vert[] = {
@@ -222,7 +167,6 @@ void buildBedNew(std::vector<float>& verts, std::vector<unsigned int>& inds, flo
     inds.insert(inds.end(), std::begin(bed_ind), std::end(bed_ind));
 }
 
-
 void readValues(int i, std::string line, std::vector<float>& vec) {
     std::string val;
 
@@ -243,7 +187,6 @@ void readValues(int i, std::string line, std::vector<float>& vec) {
         vec.push_back(std::stof(val));
     }
 }
-
 
 void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, const std::string& path, int& num_of_inds) {
     std::ifstream in(path, std::ios::in);

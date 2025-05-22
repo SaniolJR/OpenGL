@@ -73,6 +73,28 @@ int main() {
     //------------------------stol
     int inds_stol_liczba = 0;
     parseFromObj(verticesStol, indicesStol, "stol.obj", inds_stol_liczba);
+
+    std::cout << "Vertices from OBJ file:" << std::endl;
+    for (int i = 0; i < verticesStol.size(); i += 5) {
+        std::cout << verticesStol[i] << " ";
+        std::cout << verticesStol[i + 1] << " ";
+        std::cout << verticesStol[i + 2] << " ";
+        std::cout << verticesStol[i + 3] << " ";
+        std::cout << verticesStol[i + 4] << std::endl;
+    }
+    std::cout << "Indices from OBJ file:" << std::endl;
+
+    for (int i = 0; i < indicesStol.size(); i += 6) {
+        std::cout << indicesStol[i] << " ";
+        std::cout << indicesStol[i + 1] << " ";
+        std::cout << indicesStol[i + 2] << " ";
+        std::cout << indicesStol[i + 3] << " ";
+        std::cout << indicesStol[i + 4] << " ";
+        std::cout << indicesStol[i + 5] << std::endl;
+    }
+    std::cout << "Number of indices: " << inds_stol_liczba << std::endl;
+
+
     VAO vaoTable;
     VBO vboTable(verticesStol.data(), verticesStol.size() * sizeof(float));
     EBO eboTable(indicesStol.data(), indicesStol.size() * sizeof(unsigned int));
