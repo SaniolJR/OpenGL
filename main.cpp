@@ -29,10 +29,6 @@ int main() {
     std::vector<unsigned int> indicesStol;
 	buildRoom(vertices, indices);
        
-    //uwaga tutaj jest nieco inny uklad wspolrzednych - tak jakbys narsowa³ sb wykres widz¹c przed kamer¹
-    //x - pozioma, y - pionowa, z - oddalenie
-    //uwaga tutaj jest nieco inny uklad wspolrzednych - tak jakbys narsował sb wykres widząc przed kamerą
-	buildRoom(vertices, indices);
     //uwaga tutaj jest nieco inny uklad wspolrzednych - tak jakbys narsowa� sb wykres widz�c przed kamer�
     //x - pozioma, y - pionowa, z - oddalenie
 	buildBed(vertices, indices, 3.61f, 0.f, 2.5f, 1, 1.0f, 0.75f);
@@ -76,6 +72,8 @@ int main() {
     int inds_stol_liczba = 0;
     parseFromObj(verticesStol, indicesStol, "stol.obj", inds_stol_liczba);
 
+
+    //wyswietlanie testowe czy sie laduje-jak tak to jest git
     std::cout << "Vertices from OBJ file:" << std::endl;
     for (int i = 0; i < verticesStol.size(); i += 5) {
         std::cout << verticesStol[i] << " ";
@@ -134,7 +132,6 @@ int main() {
         glm::mat4 model = glm::mat4(1.0f);
         glm::vec3 lightPos(0.0f, 3.8f, 0.0f); // pozycja lampy
         glm::vec4 lightColor(1.0f, 1.0f, 0.9f, 1.0f); // lekko ciepłe światło
-        glm::vec4 lightColor(1.0f, 1.0f, 0.9f, 1.0f); // lekko ciep�e �wiat�o
 
         float ka = 0.2f;
         float kd = 1.0f;
@@ -213,9 +210,6 @@ int main() {
         //stol
         vaoTable.Bind();
         tableTex.Bind(); tableTex.texUnit(shader, "tex0", 0);
-        glUniform1f(glGetUniformLocation(shader.ID, "kd"), 1.0f);
-        glUniform1f(glGetUniformLocation(shader.ID, "ks"), 0.0f);
-        glUniform3f(glGetUniformLocation(shader.ID, "lightPos"), 0, 0, 0);
 
         glDrawElements(GL_TRIANGLES, indicesStol.size(), GL_UNSIGNED_INT, 0);
 
