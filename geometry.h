@@ -14,4 +14,17 @@
 void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds);
 void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float posX, float posY, float posZ, int orientation, float scaleX, float scaleZ);
 void readValues(int i, std::string s, std::vector<float>& vec);
-void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, const std::string& path, int& num_of_inds);
+
+struct Segment {
+    std::string material;
+    int start;
+    int count;
+};
+
+void parseFromObj(
+    std::vector<float>& verts,
+    std::vector<unsigned int>& inds,
+    const std::string& path,
+    int& num_of_inds,
+    std::vector<Segment>& segments  // now ze struct¹
+);

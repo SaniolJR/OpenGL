@@ -138,7 +138,7 @@ void readValues(int i, std::string line, std::vector<float>& vec) {
     }
 }
 
-void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, const std::string& path, int& num_of_inds) {
+void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, const std::string& path, int& num_of_inds, std::vector<Segment>& segments) {
     std::ifstream in(path, std::ios::in);
     if (!in) {
         std::cerr << "Cannot open " << path << std::endl;
@@ -152,6 +152,12 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
     int startVertOffset = vertOffset;
     std::string line;
 
+    //zmienne do obslugi materialow
+    std::string currentMtl = "default", prevMtl = currentMtl;
+    int segStart = startVertOffset;
+
+
+
     while (std::getline(in, line)) {
 
         std::string type;
@@ -162,7 +168,20 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
             i++;
         }
         i++; // przeskoczenie aktualnej spacji
-        if (type == "v") {
+        if (type == "usemtl") {
+            // zamykamy poprzedni segment
+            if (vertOffset - segStart > 0) {
+                segments.push_back({ prevMtl, segStart, vertOffset - segStart });
+            }
+            // czytamy nową nazwę materiału
+            currentMtl.clear();
+            while (i < (int)line.size() && line[i] != ' ' && line[i] != '\r' && line[i] != '\n') {
+                currentMtl += line[i++];
+            }
+            prevMtl = currentMtl;
+            segStart = vertOffset;
+        }
+        else if (type == "v") {
             readValues(i, line, positions);
         }
         else if (type == "vt") {
@@ -224,7 +243,13 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
                 // przeskocz spacjê jeœli jest
                 if (line[i] == ' ') i++;
             }
+
         }
+        
     }
+    if (vertOffset - segStart > 0) {
+        segments.push_back({ prevMtl, segStart, vertOffset - segStart });
+    }
+
     num_of_inds = vertOffset - startVertOffset;
 }

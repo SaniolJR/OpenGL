@@ -13,6 +13,8 @@
 #include "Camera.h"
 #include "Texture.h"
 #include "geometry.h"
+#include <unordered_map>
+
 
 const unsigned int width = 1280;
 const unsigned int height = 720;
@@ -23,6 +25,7 @@ Camera camera(width, height, glm::vec3(0.0f, 1.5f, -4.0f));
 
 
 int main() {
+   
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
     std::vector<float> verticesStol;
@@ -70,7 +73,8 @@ int main() {
 
     //------------------------stol
     int inds_stol_liczba = 0;
-    parseFromObj(verticesStol, indicesStol, "stol.obj", inds_stol_liczba);
+    std::vector<Segment> stolSeg;
+    parseFromObj(verticesStol, indicesStol, "stol.obj", inds_stol_liczba, stolSeg);
 
 
     //wyswietlanie testowe czy sie laduje-jak tak to jest git
@@ -110,16 +114,22 @@ int main() {
     vboTable.Unbind();
     eboTable.Unbind();
 
-
     //------------------------ladowanie tekstur
-    //trzeba sprawdzać czy bliki są w RGB czy RGBA - zmiana na RGBA naprawiła problemygit
+ //trzeba sprawdzać czy bliki są w RGB czy RGBA - zmiana na RGBA naprawiła problemygit
     Texture floorTex("floor.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture ceilingTex("ceiling.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture wallTex("wall.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture doorTex("door.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture bedTex("bed.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-   	Texture tableTex("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    Texture tableTex("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
+    std::unordered_map<std::string, Texture> texs{
+    { "szary",  Texture("door.png",  GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
+    { "table", Texture("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) }
+    };
+
+
+  
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
@@ -209,9 +219,18 @@ int main() {
 
         //stol
         vaoTable.Bind();
-        tableTex.Bind(); tableTex.texUnit(shader, "tex0", 0);
+        for (auto& s : stolSeg) {
+            Texture* tex = nullptr;
+            auto it = texs.find(s.material);
+            if (it != texs.end()) tex = &it->second;
+            else                 tex = &tableTex;    // albo floorTex – cokolwiek domyślnego
 
-        glDrawElements(GL_TRIANGLES, indicesStol.size(), GL_UNSIGNED_INT, 0);
+            tex->Bind();
+            tex->texUnit(shader, "tex0", 0);
+            glDrawElements(GL_TRIANGLES, s.count, GL_UNSIGNED_INT, (void*)(s.start * sizeof(unsigned int)));
+        }
+
+
 
 
         glfwSwapBuffers(window);
