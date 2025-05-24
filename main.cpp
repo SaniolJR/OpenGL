@@ -25,18 +25,14 @@ Camera camera(width, height, glm::vec3(0.0f, 1.5f, -4.0f));
 
 
 int main() {
-   
+   //wektory do przechowywania wierzcholków - osobno dla pokoju jak i dla każdego rodzaju mabla aby nie było syfu!
     std::vector<float> vertices;
     std::vector<unsigned int> indices;
     std::vector<float> verticesStol;
     std::vector<unsigned int> indicesStol;
-	buildRoom(vertices, indices);
-       
-    //uwaga tutaj jest nieco inny uklad wspolrzednych - tak jakbys narsowa� sb wykres widz�c przed kamer�
-    //x - pozioma, y - pionowa, z - oddalenie
-	buildBed(vertices, indices, 3.61f, 0.f, 2.5f, 1, 1.0f, 0.75f);
-    buildBed(vertices, indices, 3.61f, 0.f, -2.5f, 1, 1.0f, 0.75f);
-
+    std::vector<float> verticesSzafa;
+    std::vector<unsigned int> indicesSzafa;
+	buildRoom(vertices, indices);//rosowanie pokoju
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -59,23 +55,17 @@ int main() {
     Shader shader("default.vert", "default.frag");
     VAO vao;
     vao.Bind();
-
     VBO vbo(vertices.data(), vertices.size() * sizeof(float));
     EBO ebo(indices.data(), indices.size() * sizeof(unsigned int));
-
     vao.LinkAttrib(vbo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);               // pozycja
     vao.LinkAttrib(vbo, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float))); // tekstura
     vao.LinkAttrib(vbo, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float))); // normalne
-
-
     vao.Unbind(); vbo.Unbind(); ebo.Unbind();
-
 
     //------------------------stol
     std::vector<Segment> stolSeg;
-    parseFromObj(verticesStol, indicesStol, "stol.obj", stolSeg, 0.5, 0.0, -2.5, 1.0);
-    parseFromObj(verticesStol, indicesStol, "stol.obj", stolSeg, 2.5, 0.0, 2.5, 0.2);
-
+    parseFromObj(verticesStol, indicesStol, "stol.obj", stolSeg, 2.68, 0.55, -1.75, 0.75);   //-x, -y, -z
+    parseFromObj(verticesStol, indicesStol, "stol.obj", stolSeg, 2.68, 0.56, 1.75, 0.75);    //-x, -y, -z
 
     VAO vaoTable;
     VBO vboTable(verticesStol.data(), verticesStol.size() * sizeof(float));
@@ -91,6 +81,23 @@ int main() {
     vaoTable.Unbind();
     vboTable.Unbind();
     eboTable.Unbind();
+    //------------------------szafa
+    parseFromObj(verticesSzafa, indicesSzafa, "szafa.obj", stolSeg, 3.95, 2.475, 6.15, 0.5);
+    parseFromObj(verticesSzafa, indicesSzafa, "szafa.obj", stolSeg, 3.95, 2.475, -6.8, 0.5);
+    VAO vaoSzafa;
+    VBO vboSzafa(verticesSzafa.data(), verticesSzafa.size() * sizeof(float));
+    EBO eboSzafa(indicesSzafa.data(), indicesSzafa.size() * sizeof(unsigned int));
+       
+    vaoSzafa.Bind();
+    vboSzafa.Bind();
+    eboSzafa.Bind();
+    vaoSzafa.LinkAttrib(vboSzafa, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);              // pos
+    vaoSzafa.LinkAttrib(vboSzafa, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    vaoSzafa.LinkAttrib(vboSzafa, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float))); // normals
+       
+    vaoSzafa.Unbind();
+    vboSzafa.Unbind();
+    eboSzafa.Unbind();
 
     //------------------------ladowanie tekstur
  //trzeba sprawdzać czy bliki są w RGB czy RGBA - zmiana na RGBA naprawiła problemygit
@@ -140,62 +147,31 @@ int main() {
         camera.updateMatrix(45.0f, 0.1f, 100.0f);
         camera.Matrix(shader, "camMatrix");
 
-        
+		//-------------------------rysowanie pokoju
         vao.Bind();
-
         // podłoga
         floorTex.Bind();
         floorTex.texUnit(shader, "tex0", 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(0 * sizeof(unsigned int)));
-
         // sufit
         ceilingTex.Bind();
         ceilingTex.texUnit(shader, "tex0", 0);
-
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(6 * sizeof(unsigned int)));
-        
         // przednia
         wallTex.Bind();
         wallTex.texUnit(shader, "tex0", 0);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(12 * sizeof(unsigned int)));
-
         // tylna
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(18 * sizeof(unsigned int)));
-
         // lewa
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(24 * sizeof(unsigned int)));
-
         // prawa
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(30 * sizeof(unsigned int)));
-
 
         //drzwi
         doorTex.Bind();
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(36 * sizeof(unsigned int)));
-
-        // łóżko blat 
-        bedTex.Bind();
-		bedTex.texUnit(shader, "tex0", 0);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(42 * sizeof(unsigned int)));
-
-        // nogi łóżka
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(48 * sizeof(unsigned int)));
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(54 * sizeof(unsigned int)));
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(60 * sizeof(unsigned int)));
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(66 * sizeof(unsigned int)));
-
-        // łóżko blat 
-        bedTex.Bind();
-        bedTex.texUnit(shader, "tex0", 0);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(72 * sizeof(unsigned int)));
-
-        // nogi łóżka
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(78 * sizeof(unsigned int)));
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(84 * sizeof(unsigned int)));
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(90 * sizeof(unsigned int)));
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (void*)(96 * sizeof(unsigned int)));
-
-        //stol
+		//--------------------------rysowanie stolu
         vaoTable.Bind();
         for (auto& s : stolSeg) {
             Texture* tex = nullptr;
@@ -207,7 +183,17 @@ int main() {
             tex->texUnit(shader, "tex0", 0);
             glDrawElements(GL_TRIANGLES, s.count, GL_UNSIGNED_INT, (void*)(s.start * sizeof(unsigned int)));
         }
-
+		//-------------------------rysowanie szafy
+		vaoSzafa.Bind();
+		for (auto& s : stolSeg) {
+			Texture* tex = nullptr;
+			auto it = texs.find(s.material);
+			if (it != texs.end()) tex = &it->second;
+			else                 tex = &tableTex;    // albo floorTex – cokolwiek domyślnego
+			tex->Bind();
+			tex->texUnit(shader, "tex0", 0);
+			glDrawElements(GL_TRIANGLES, s.count, GL_UNSIGNED_INT, (void*)(s.start * sizeof(unsigned int)));
+		}
 
 
 
