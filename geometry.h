@@ -25,6 +25,9 @@ void parseFromObj(
     std::vector<float>& verts,
     std::vector<unsigned int>& inds,
     const std::string& path,
-    int& num_of_inds,
-    std::vector<Segment>& segments  // now ze struct¹
+    std::vector<Segment>& segments,  // now ze struct¹
+    float x,
+    float y,
+    float z, 
+    float scale
 );

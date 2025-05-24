@@ -138,7 +138,7 @@ void readValues(int i, std::string line, std::vector<float>& vec) {
     }
 }
 
-void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, const std::string& path, int& num_of_inds, std::vector<Segment>& segments) {
+void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, const std::string& path, std::vector<Segment>& segments, float x, float y, float z, float scale) {
     std::ifstream in(path, std::ios::in);
     if (!in) {
         std::cerr << "Cannot open " << path << std::endl;
@@ -149,12 +149,11 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
     std::vector<float> texcoords;
     std::vector<float> normals;
     int vertOffset = verts.size() / 8; // ile juz bylo verteksów
-    int startVertOffset = vertOffset;
     std::string line;
 
     //zmienne do obslugi materialow
     std::string currentMtl = "default", prevMtl = currentMtl;
-    int segStart = startVertOffset;
+    int segStart = vertOffset;
 
 
 
@@ -214,9 +213,9 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
                 posIdx--; texIdx--; // indeksy od 1 w .obj, u nas od 0
 
                 // dodajemy pozycje (3 floaty)
-                verts.push_back(positions[posIdx * 3 + 0]);
-                verts.push_back(positions[posIdx * 3 + 1]);
-                verts.push_back(positions[posIdx * 3 + 2]);
+                verts.push_back( (positions[posIdx * 3 + 0] + x) * scale );
+                verts.push_back( (positions[posIdx * 3 + 1] + y) * scale );
+                verts.push_back( (positions[posIdx * 3 + 2] + z) * scale );
 
                 // dodajemy tekstury (2 floaty)
                 verts.push_back(texcoords[texIdx * 2 + 0]);
@@ -251,5 +250,4 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
         segments.push_back({ prevMtl, segStart, vertOffset - segStart });
     }
 
-    num_of_inds = vertOffset - startVertOffset;
 }

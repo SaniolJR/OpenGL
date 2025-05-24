@@ -16,8 +16,8 @@
 #include <unordered_map>
 
 
-const unsigned int width = 1280;
-const unsigned int height = 720;
+const unsigned int width = 1920;
+const unsigned int height = 1080;
 
 //ustawienie startowej pozycji kamery na srodek pokoju
 Camera camera(width, height, glm::vec3(0.0f, 1.5f, -4.0f));
@@ -72,31 +72,9 @@ int main() {
 
 
     //------------------------stol
-    int inds_stol_liczba = 0;
     std::vector<Segment> stolSeg;
-    parseFromObj(verticesStol, indicesStol, "stol.obj", inds_stol_liczba, stolSeg);
-
-
-    //wyswietlanie testowe czy sie laduje-jak tak to jest git
-    std::cout << "Vertices from OBJ file:" << std::endl;
-    for (int i = 0; i < verticesStol.size(); i += 5) {
-        std::cout << verticesStol[i] << " ";
-        std::cout << verticesStol[i + 1] << " ";
-        std::cout << verticesStol[i + 2] << " ";
-        std::cout << verticesStol[i + 3] << " ";
-        std::cout << verticesStol[i + 4] << std::endl;
-    }
-    std::cout << "Indices from OBJ file:" << std::endl;
-
-    for (int i = 0; i < indicesStol.size(); i += 6) {
-        std::cout << indicesStol[i] << " ";
-        std::cout << indicesStol[i + 1] << " ";
-        std::cout << indicesStol[i + 2] << " ";
-        std::cout << indicesStol[i + 3] << " ";
-        std::cout << indicesStol[i + 4] << " ";
-        std::cout << indicesStol[i + 5] << std::endl;
-    }
-    std::cout << "Number of indices: " << inds_stol_liczba << std::endl;
+    parseFromObj(verticesStol, indicesStol, "stol.obj", stolSeg, 0.5, 0.0, -2.5, 1.0);
+    parseFromObj(verticesStol, indicesStol, "stol.obj", stolSeg, 2.5, 0.0, 2.5, 0.2);
 
 
     VAO vaoTable;
