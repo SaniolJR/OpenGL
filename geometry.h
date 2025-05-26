@@ -10,6 +10,9 @@
 #include <fstream>      // std::ifstream
 #include <sstream>      // std::istringstream
 #include <cstdlib>      // std::exit
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds);
 void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float posX, float posY, float posZ, int orientation, float scaleX, float scaleZ);
@@ -21,13 +24,11 @@ struct Segment {
     int count;
 };
 
-void parseFromObj(
-    std::vector<float>& verts,
-    std::vector<unsigned int>& inds,
-    const std::string& path,
-    std::vector<Segment>& segments,  // now ze struct¹
-    float x,
-    float y,
-    float z, 
-    float scale
-);
+void parseFromObj(std::vector<float>& verts, 
+    std::vector<unsigned int>& inds, 
+    const std::string& path, 
+    std::vector<Segment>& segments, 
+    float x, float y, float z, 
+    float scale);
+
+void rotateVertices(std::vector<float>& verts, float angleX, float angleY, float angleZ);

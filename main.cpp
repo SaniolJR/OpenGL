@@ -32,7 +32,7 @@ int main() {
     std::vector<unsigned int> indicesStol;
     std::vector<float> verticesSzafa;
     std::vector<unsigned int> indicesSzafa;
-	std::vector<float> verticesLozko;
+	std::vector<float> verticesLozko1, verticesLozko;
 	std::vector<unsigned int> indicesLozko;
 	buildRoom(vertices, indices);//rosowanie pokoju
 
@@ -66,7 +66,7 @@ int main() {
 
     //------------------------stol
     std::vector<Segment> stolSeg;
-    parseFromObj(verticesStol, indicesStol, "stol.obj", stolSeg, 2.68, 0.55, -1.75, 0.75);   //-x, -y, -z
+    parseFromObj(verticesStol, indicesStol, "stol.obj", stolSeg, 2.68, 0.55, -1.75, 0.75);   //-x, -y, -z, skala
     parseFromObj(verticesStol, indicesStol, "stol.obj", stolSeg, 2.68, 0.56, 1.75, 0.75);    //-x, -y, -z
 
     VAO vaoTable;
@@ -103,8 +103,10 @@ int main() {
     eboSzafa.Unbind();
 	//------------------------łóżko
     std::vector<Segment> LozkoSeg;
-    parseFromObj(verticesLozko, indicesLozko, "lozko.obj", LozkoSeg, 3.95, 0.475, 6.15, 0.4);
-    parseFromObj(verticesLozko, indicesLozko, "lozko.obj", LozkoSeg, 3.95, 0.475, -6.8, 0.45);
+    parseFromObj(verticesLozko, indicesLozko, "lozko.obj", LozkoSeg, 0.95, 0.475, 6.15, 0.3);
+    parseFromObj(verticesLozko, indicesLozko, "lozko.obj", LozkoSeg, 0.95, 0.475, -6.8, 0.35);
+    rotateVertices(verticesLozko, 0.0f, 90.0f, 0.0f); // np. obrót stołu o 30° wokół Y
+
     VAO vaoLozko;
     VBO vboLozko(verticesLozko.data(), verticesLozko.size() * sizeof(float));
     EBO eboLozko(indicesLozko.data(), indicesLozko.size() * sizeof(unsigned int));

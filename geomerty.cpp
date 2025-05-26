@@ -155,8 +155,6 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
     std::string currentMtl = "default", prevMtl = currentMtl;
     int segStart = vertOffset;
 
-
-
     while (std::getline(in, line)) {
 
         std::string type;
@@ -250,4 +248,22 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
         segments.push_back({ prevMtl, segStart, vertOffset - segStart });
     }
 
+}
+
+// obraca same pozycje (x,y,z) w twoim danym wektorze verts o podane kąty w stopniach
+void rotateVertices( std::vector<float>& verts, float angleX, float angleY, float angleZ) {
+    // matryca obrotu
+    glm::mat4 R = glm::mat4(1.0f);
+    R = glm::rotate(R, glm::radians(angleX), glm::vec3(1, 0, 0));
+    R = glm::rotate(R, glm::radians(angleY), glm::vec3(0, 1, 0));
+    R = glm::rotate(R, glm::radians(angleZ), glm::vec3(0, 0, 1));
+
+    const int stride = 8; // 3 pozycja + 2 UV + 3 normalne
+    for (int i = 0; i + 2 < (int)verts.size(); i += stride) {
+        glm::vec4 p{ verts[i], verts[i + 1], verts[i + 2], 1.0f };
+        p = R * p;
+        verts[i] = p.x;
+        verts[i + 1] = p.y;
+        verts[i + 2] = p.z;
+    }
 }
