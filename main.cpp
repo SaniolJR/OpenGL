@@ -82,8 +82,9 @@ int main() {
     vboTable.Unbind();
     eboTable.Unbind();
     //------------------------szafa
-    parseFromObj(verticesSzafa, indicesSzafa, "szafa.obj", stolSeg, 3.95, 2.475, 6.15, 0.5);
-    parseFromObj(verticesSzafa, indicesSzafa, "szafa.obj", stolSeg, 3.95, 2.475, -6.8, 0.5);
+    std::vector<Segment> szafaSeg;
+    parseFromObj(verticesSzafa, indicesSzafa, "szafa.obj", szafaSeg, 3.95, 2.475, 6.15, 0.5);
+    parseFromObj(verticesSzafa, indicesSzafa, "szafa.obj", szafaSeg, 3.95, 2.475, -6.8, 0.5);
     VAO vaoSzafa;
     VBO vboSzafa(verticesSzafa.data(), verticesSzafa.size() * sizeof(float));
     EBO eboSzafa(indicesSzafa.data(), indicesSzafa.size() * sizeof(unsigned int));
@@ -109,7 +110,7 @@ int main() {
     Texture tableTex("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
     std::unordered_map<std::string, Texture> texs{
-    { "szary",  Texture("door.png",  GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
+    { "szary",  Texture("plastic_szary.png",  GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
     { "table", Texture("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) }
     };
 
@@ -128,7 +129,7 @@ int main() {
         glm::vec3 lightPos(0.0f, 3.8f, 0.0f); // pozycja lampy
         glm::vec4 lightColor(1.0f, 1.0f, 0.9f, 1.0f); // lekko ciepłe światło
 
-        float ka = 0.2f;
+        float ka = 0.5f;
         float kd = 1.0f;
         float ks = 0.5f;
         float shininess = 32.0f;
@@ -185,7 +186,7 @@ int main() {
         }
 		//-------------------------rysowanie szafy
 		vaoSzafa.Bind();
-		for (auto& s : stolSeg) {
+		for (auto& s : szafaSeg) {
 			Texture* tex = nullptr;
 			auto it = texs.find(s.material);
 			if (it != texs.end()) tex = &it->second;
