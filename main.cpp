@@ -32,8 +32,10 @@ int main() {
     std::vector<unsigned int> indicesStol;
     std::vector<float> verticesSzafa;
     std::vector<unsigned int> indicesSzafa;
-	std::vector<float> verticesLozko1, verticesLozko;
+	std::vector<float> verticesLozko;
 	std::vector<unsigned int> indicesLozko;
+    std::vector<float> verticesLozko1;
+    std::vector<unsigned int> indicesLozko1;
 	buildRoom(vertices, indices);//rosowanie pokoju
 
     glfwInit();
@@ -103,8 +105,7 @@ int main() {
     eboSzafa.Unbind();
 	//------------------------łóżko
     std::vector<Segment> LozkoSeg;
-    parseFromObj(verticesLozko, indicesLozko, "lozko.obj", LozkoSeg, 0.95, 0.475, 6.15, 0.3);
-    parseFromObj(verticesLozko, indicesLozko, "lozko.obj", LozkoSeg, 0.95, 0.475, -6.8, 0.35);
+    parseFromObj(verticesLozko, indicesLozko, "lozko.obj", LozkoSeg, 10.5, 1.2, -6.5, 0.25);
     rotateVertices(verticesLozko, 0.0f, 90.0f, 0.0f); // np. obrót stołu o 30° wokół Y
 
     VAO vaoLozko;
@@ -122,20 +123,40 @@ int main() {
     vboLozko.Unbind();
     eboLozko.Unbind();
 
+    //lozko 2
+    std::vector<Segment> Lozko1Seg;
+    parseFromObj(verticesLozko1, indicesLozko1, "lozko.obj", Lozko1Seg, 10.5, 1.2, 6.5, 0.25);
+    rotateVertices(verticesLozko1, 0.0f, 270.0f, 0.0f); // np. obrót stołu o 30° wokół Y
+
+    VAO vaoLozko1;
+    VBO vboLozko1(verticesLozko1.data(), verticesLozko1.size() * sizeof(float));
+    EBO eboLozko1(indicesLozko1.data(), indicesLozko1.size() * sizeof(unsigned int));
+
+    vaoLozko1.Bind();
+    vboLozko1.Bind();
+    eboLozko1.Bind();
+    vaoLozko1.LinkAttrib(vboLozko1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);              // pos
+    vaoLozko1.LinkAttrib(vboLozko1, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    vaoLozko1.LinkAttrib(vboLozko1, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float))); // normals
+
+    vaoLozko1.Unbind();
+    vboLozko1.Unbind();
+    eboLozko1.Unbind();
+
     //------------------------ladowanie tekstur
  //trzeba sprawdzać czy bliki są w RGB czy RGBA - zmiana na RGBA naprawiła problemygit
     Texture floorTex("floor.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture ceilingTex("ceiling.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture wallTex("wall.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    Texture doorTex("door.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    Texture doorTex("door2.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture bedTex("bed.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    Texture tableTex("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
+    Texture tableTex("drewno1.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
     std::unordered_map<std::string, Texture> texs{
     { "szary",  Texture("plastic_szary.png",  GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
-    { "table", Texture("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
-    { "posciel", Texture("bed.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
-    { "przescieradlo", Texture("bed.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) }
+    { "table", Texture("drewno1.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
+    { "posciel", Texture("posciel.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
+    { "przescieradlo", Texture("przescieradlo.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) }
     };
 
 
@@ -231,6 +252,16 @@ int main() {
             glDrawElements(GL_TRIANGLES, s.count, GL_UNSIGNED_INT, (void*)(s.start * sizeof(unsigned int)));
         }
 
+        vaoLozko1.Bind();
+        for (auto& s : Lozko1Seg) {
+            Texture* tex = nullptr;
+            auto it = texs.find(s.material);
+            if (it != texs.end()) tex = &it->second;
+            else                 tex = &tableTex;    // albo floorTex – cokolwiek domyślnego
+            tex->Bind();
+            tex->texUnit(shader, "tex0", 0);
+            glDrawElements(GL_TRIANGLES, s.count, GL_UNSIGNED_INT, (void*)(s.start * sizeof(unsigned int)));
+        }
 
         glfwSwapBuffers(window);
     }
