@@ -32,6 +32,8 @@ int main() {
     std::vector<unsigned int> indicesStol;
     std::vector<float> verticesSzafa;
     std::vector<unsigned int> indicesSzafa;
+	std::vector<float> verticesLozko;
+	std::vector<unsigned int> indicesLozko;
 	buildRoom(vertices, indices);//rosowanie pokoju
 
     glfwInit();
@@ -99,6 +101,24 @@ int main() {
     vaoSzafa.Unbind();
     vboSzafa.Unbind();
     eboSzafa.Unbind();
+	//------------------------łóżko
+    std::vector<Segment> LozkoSeg;
+    parseFromObj(verticesLozko, indicesLozko, "lozko.obj", LozkoSeg, 3.95, 0.475, 6.15, 0.4);
+    parseFromObj(verticesLozko, indicesLozko, "lozko.obj", LozkoSeg, 3.95, 0.475, -6.8, 0.45);
+    VAO vaoLozko;
+    VBO vboLozko(verticesLozko.data(), verticesLozko.size() * sizeof(float));
+    EBO eboLozko(indicesLozko.data(), indicesLozko.size() * sizeof(unsigned int));
+
+    vaoLozko.Bind();
+    vboLozko.Bind();
+    eboLozko.Bind();
+    vaoLozko.LinkAttrib(vboLozko, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);              // pos
+    vaoLozko.LinkAttrib(vboLozko, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    vaoLozko.LinkAttrib(vboLozko, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float))); // normals
+
+    vaoLozko.Unbind();
+    vboLozko.Unbind();
+    eboLozko.Unbind();
 
     //------------------------ladowanie tekstur
  //trzeba sprawdzać czy bliki są w RGB czy RGBA - zmiana na RGBA naprawiła problemygit
@@ -111,7 +131,9 @@ int main() {
 
     std::unordered_map<std::string, Texture> texs{
     { "szary",  Texture("plastic_szary.png",  GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
-    { "table", Texture("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) }
+    { "table", Texture("drewno.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
+    { "posciel", Texture("bed.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) },
+    { "przescieradlo", Texture("bed.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) }
     };
 
 
@@ -195,7 +217,17 @@ int main() {
 			tex->texUnit(shader, "tex0", 0);
 			glDrawElements(GL_TRIANGLES, s.count, GL_UNSIGNED_INT, (void*)(s.start * sizeof(unsigned int)));
 		}
-
+		//--------------------------rysowanie łóżka
+		vaoLozko.Bind();
+		for (auto& s : LozkoSeg) {
+            Texture* tex = nullptr;
+            auto it = texs.find(s.material);
+            if (it != texs.end()) tex = &it->second;
+            else                 tex = &tableTex;    // albo floorTex – cokolwiek domyślnego
+            tex->Bind();
+            tex->texUnit(shader, "tex0", 0);
+            glDrawElements(GL_TRIANGLES, s.count, GL_UNSIGNED_INT, (void*)(s.start * sizeof(unsigned int)));
+        }
 
 
         glfwSwapBuffers(window);
