@@ -17,6 +17,7 @@
 void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds);
 void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float posX, float posY, float posZ, int orientation, float scaleX, float scaleZ);
 void readValues(int i, std::string s, std::vector<float>& vec);
+void buildSphere(std::vector<float>& vertices, std::vector<unsigned int>& indices, float radius, int sectorCount = 24, int stackCount = 16);
 
 struct Segment {
     std::string material;

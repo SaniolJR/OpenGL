@@ -267,3 +267,55 @@ void rotateVertices( std::vector<float>& verts, float angleX, float angleY, floa
         verts[i + 2] = p.z;
     }
 }
+
+void buildSphere(std::vector<float>& vertices, std::vector<unsigned int>& indices, float radius, int sectorCount, int stackCount) {
+    const float PI = 3.14159265359f;
+    vertices.clear();
+    indices.clear();
+
+    for (int i = 0; i <= stackCount; ++i) {
+        float stackAngle = PI / 2 - i * PI / stackCount;
+        float xy = radius * cosf(stackAngle);
+        float z = radius * sinf(stackAngle);
+
+        for (int j = 0; j <= sectorCount; ++j) {
+            float sectorAngle = j * 2 * PI / sectorCount;
+            float x = xy * cosf(sectorAngle);
+            float y = xy * sinf(sectorAngle);
+
+            // pozycja
+            vertices.push_back(x);
+            vertices.push_back(y);
+            vertices.push_back(z);
+            // tekstura (nieistotna, ale coś trzeba)
+            vertices.push_back((float)j / sectorCount);
+            vertices.push_back((float)i / stackCount);
+            // normalne
+            glm::vec3 normal = glm::normalize(glm::vec3(x, y, z));
+            vertices.push_back(normal.x);
+            vertices.push_back(normal.y);
+            vertices.push_back(normal.z);
+        }
+    }
+
+    for (int i = 0; i < stackCount; ++i) {
+        int k1 = i * (sectorCount + 1);
+        int k2 = k1 + sectorCount + 1;
+
+        for (int j = 0; j < sectorCount; ++j, ++k1, ++k2) {
+            if (i != 0) {
+                indices.push_back(k1);
+                indices.push_back(k2);
+                indices.push_back(k1 + 1);
+            }
+            if (i != (stackCount - 1)) {
+                indices.push_back(k1 + 1);
+                indices.push_back(k2);
+                indices.push_back(k2 + 1);
+            }
+        }
+    }
+}
+
+
+

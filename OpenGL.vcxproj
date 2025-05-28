@@ -158,6 +158,8 @@
   <ItemGroup>
     <None Include="default.frag" />
     <None Include="default.vert" />
+    <None Include="led.frag" />
+    <None Include="led.vert" />
     <None Include="Light.frag" />
     <None Include="Light.vert" />
     <None Include="mirror.frag" />

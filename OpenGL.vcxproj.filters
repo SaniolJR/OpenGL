@@ -85,5 +85,7 @@
     <None Include="Light.vert" />
     <None Include="mirror.frag" />
     <None Include="mirror.vert" />
+    <None Include="led.frag" />
+    <None Include="led.vert" />
   </ItemGroup>
 </Project>

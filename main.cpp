@@ -22,6 +22,17 @@ const unsigned int height = 1080;
 //ustawienie startowej pozycji kamery na srodek pokoju
 Camera camera(width, height, glm::vec3(0.0f, 1.5f, -4.0f));
 
+std::vector<glm::vec3> lightPositions = {
+    {-2.4f, 2.9f, -0.75f},
+    {-2.4f, 2.9f, -0.25f},
+    {-2.4f, 2.9f,  0.25f},
+    {-2.4f, 2.9f,  0.75f},
+    {2.4f, 2.9f, -0.75f },
+    {2.4f, 2.9f, -0.25f},
+    {2.4f, 2.9f, 0.25f},
+    {2.4f, 2.9f, 0.75f}
+};
+
 
 
 int main() {
@@ -36,7 +47,11 @@ int main() {
 	std::vector<unsigned int> indicesLozko;
     std::vector<float> verticesLozko1;
     std::vector<unsigned int> indicesLozko1;
+    std::vector<float> ledVertices;
+    std::vector<unsigned int> ledIndices;
+
 	buildRoom(vertices, indices);//rosowanie pokoju
+	buildSphere(ledVertices, ledIndices, 0.1f);//rysowanie sfery LED
 
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -57,6 +72,8 @@ int main() {
 
     //------------------------pokoj
     Shader shader("default.vert", "default.frag");
+    Shader ledShader("led.vert", "led.frag");
+
     VAO vao;
     vao.Bind();
     VBO vbo(vertices.data(), vertices.size() * sizeof(float));
@@ -143,6 +160,18 @@ int main() {
     vboLozko1.Unbind();
     eboLozko1.Unbind();
 
+    VAO vaoLED;
+    VBO vboLED(ledVertices.data(), ledVertices.size() * sizeof(float));
+    EBO eboLED(ledIndices.data(), ledIndices.size() * sizeof(unsigned int));
+
+    vaoLED.Bind();
+    vboLED.Bind();
+    eboLED.Bind();
+    vaoLED.LinkAttrib(vboLED, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+    vaoLED.LinkAttrib(vboLED, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    vaoLED.LinkAttrib(vboLED, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float)));
+    vaoLED.Unbind();
+
     //------------------------ladowanie tekstur
  //trzeba sprawdzać czy bliki są w RGB czy RGBA - zmiana na RGBA naprawiła problemygit
     Texture floorTex("floor.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
@@ -174,10 +203,27 @@ int main() {
         glm::vec3 lightPos(0.0f, 3.8f, 0.0f); // pozycja lampy
         glm::vec4 lightColor(1.0f, 1.0f, 0.9f, 1.0f); // lekko ciepłe światło
 
-        float ka = 0.5f;
-        float kd = 1.0f;
-        float ks = 0.5f;
-        float shininess = 32.0f;
+        float ka = 0.4f;
+        float kd = 0.6f;
+        float ks = 0.2f;
+        float shininess = 64.0f; // bardziej rozmyte odbicia
+
+
+        float t = glfwGetTime();
+        glm::vec3 ledColor(
+            0.5f * sin(t * 2.0f) + 0.5f,
+            0.5f * sin(t * 2.0f + 2.0f) + 0.5f,
+            0.5f * sin(t * 2.0f + 4.0f) + 0.5f
+        );
+
+        for (int i = 0; i < 8; ++i) {
+            glUniform3f(glGetUniformLocation(shader.ID, ("lightPositions[" + std::to_string(i) + "]").c_str()),
+                lightPositions[i].x, lightPositions[i].y, lightPositions[i].z);
+
+            glUniform3f(glGetUniformLocation(shader.ID, ("lightColors[" + std::to_string(i) + "]").c_str()),
+                ledColor.r, ledColor.g, ledColor.b);  // wszędzie ten sam
+        }
+
 
         glUniform1f(glGetUniformLocation(shader.ID, "ka"), ka);
         glUniform1f(glGetUniformLocation(shader.ID, "kd"), kd);
@@ -262,6 +308,29 @@ int main() {
             tex->texUnit(shader, "tex0", 0);
             glDrawElements(GL_TRIANGLES, s.count, GL_UNSIGNED_INT, (void*)(s.start * sizeof(unsigned int)));
         }
+
+        ledShader.Activate();
+        camera.Matrix(ledShader, "camMatrix");
+
+        vaoLED.Bind();
+        for (int i = 0; i < 8; ++i) {
+            glm::mat4 model = glm::translate(glm::mat4(1.0f), lightPositions[i]);
+            glUniformMatrix4fv(glGetUniformLocation(ledShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(model));
+
+            glm::vec3 brightColor = glm::clamp(ledColor * 1.5f, 0.0f, 1.0f);
+            glUniform3f(glGetUniformLocation(ledShader.ID, "ledColor"), brightColor.r, brightColor.g, brightColor.b);
+
+
+            glDrawElements(GL_TRIANGLES, ledIndices.size(), GL_UNSIGNED_INT, 0);
+        }
+
+
+        // główne białe światło
+        glm::vec3 mainLightColor = glm::vec3(1.0f, 0.95f, 0.95f);
+        glm::vec3 mainLightPos = glm::vec3(0.0f, 3.8f, 0.0f);
+
+        glUniform3f(glGetUniformLocation(shader.ID, "mainLightColor"), mainLightColor.r, mainLightColor.g, mainLightColor.b);
+        glUniform3f(glGetUniformLocation(shader.ID, "mainLightPos"), mainLightPos.x, mainLightPos.y, mainLightPos.z);
 
         glfwSwapBuffers(window);
     }
