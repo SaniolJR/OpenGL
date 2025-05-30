@@ -174,9 +174,11 @@ int main() {
     vaoLED.LinkAttrib(vboLED, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float)));
     vaoLED.Unbind();
 
-    //------------------------krzeslo
+    //------------------------krzeslo x2
     std::vector<Segment> krzesloSeg;
-    parseFromObj(verticeskrzeslo, indiceskrzeslo, "krzeslo.obj", krzesloSeg, 10.5, 1.2, -6.5, 0.25);
+    parseFromObj(verticeskrzeslo, indiceskrzeslo, "krzeslo.obj", krzesloSeg, 7.5, 1.6, -3.5, 0.25);
+    parseFromObj(verticeskrzeslo, indiceskrzeslo, "krzeslo.obj", krzesloSeg, 5.5, 1.55, -3.5, 0.25);
+
     rotateVertices(verticeskrzeslo, 0.0f, 90.0f, 0.0f); // np. obrót stołu o 30° wokół Y
 
     VAO vaokrzeslo;
