@@ -53,12 +53,12 @@ void Camera::Inputs(GLFWwindow* window)
 	if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS)
 	{
 		//predkosc srintu (lshift)
-		speed = 0.007f;
+		speed = 0.025f;
 	}
 	else if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_RELEASE)
 	{
 		//predkosc normalnego chodzenia
-		speed = 0.0005f;
+		speed = 0.01f;
 	}
 	// Handles mouse inputs
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS)

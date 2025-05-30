@@ -47,6 +47,8 @@ int main() {
 	std::vector<unsigned int> indicesLozko;
     std::vector<float> verticesLozko1;
     std::vector<unsigned int> indicesLozko1;
+	std::vector<float> verticeskrzeslo;
+	std::vector<unsigned int> indiceskrzeslo;
     std::vector<float> ledVertices;
     std::vector<unsigned int> ledIndices;
 
@@ -172,13 +174,32 @@ int main() {
     vaoLED.LinkAttrib(vboLED, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float)));
     vaoLED.Unbind();
 
+    //------------------------krzeslo
+    std::vector<Segment> krzesloSeg;
+    parseFromObj(verticeskrzeslo, indiceskrzeslo, "krzeslo.obj", krzesloSeg, 10.5, 1.2, -6.5, 0.25);
+    rotateVertices(verticeskrzeslo, 0.0f, 90.0f, 0.0f); // np. obrót stołu o 30° wokół Y
+
+    VAO vaokrzeslo;
+    VBO vbokrzeslo(verticeskrzeslo.data(), verticeskrzeslo.size() * sizeof(float));
+    EBO ebokrzeslo(indiceskrzeslo.data(), indiceskrzeslo.size() * sizeof(unsigned int));
+
+    vaokrzeslo.Bind();
+    vbokrzeslo.Bind();
+    ebokrzeslo.Bind();
+    vaokrzeslo.LinkAttrib(vbokrzeslo, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);              // pos
+    vaokrzeslo.LinkAttrib(vbokrzeslo, 1, 2, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    vaokrzeslo.LinkAttrib(vbokrzeslo, 2, 3, GL_FLOAT, 8 * sizeof(float), (void*)(5 * sizeof(float))); // normals
+
+    vaokrzeslo.Unbind();
+    vbokrzeslo.Unbind();
+    ebokrzeslo.Unbind();
+
     //------------------------ladowanie tekstur
  //trzeba sprawdzać czy bliki są w RGB czy RGBA - zmiana na RGBA naprawiła problemygit
     Texture floorTex("floor.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture ceilingTex("ceiling.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture wallTex("wall.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture doorTex("door2.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
-    Texture bedTex("bed.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
     Texture tableTex("drewno1.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE);
 
     std::unordered_map<std::string, Texture> texs{
@@ -308,6 +329,20 @@ int main() {
             tex->texUnit(shader, "tex0", 0);
             glDrawElements(GL_TRIANGLES, s.count, GL_UNSIGNED_INT, (void*)(s.start * sizeof(unsigned int)));
         }
+		//--------------------------rysowanie krzesła
+		vaokrzeslo.Bind();
+		for (auto& s : krzesloSeg) {
+			Texture* tex = nullptr;
+			auto it = texs.find(s.material);
+			if (it != texs.end()) tex = &it->second;
+			else                 tex = &tableTex;    // albo floorTex – cokolwiek domyślnego
+			tex->Bind();
+			tex->texUnit(shader, "tex0", 0);
+			glDrawElements(GL_TRIANGLES, s.count, GL_UNSIGNED_INT, (void*)(s.start * sizeof(unsigned int)));
+		}
+
+
+        //------------------------rysowanie swaitla
 
         ledShader.Activate();
         camera.Matrix(ledShader, "camMatrix");
@@ -336,7 +371,7 @@ int main() {
     }
 
     vao.Delete(); vbo.Delete(); ebo.Delete(); shader.Delete();
-    floorTex.Delete(); wallTex.Delete(); ceilingTex.Delete(); doorTex.Delete(); bedTex.Delete();
+    floorTex.Delete(); wallTex.Delete(); ceilingTex.Delete(); doorTex.Delete();
 
     glfwDestroyWindow(window);
     glfwTerminate();
