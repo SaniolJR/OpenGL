@@ -2,7 +2,6 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
-#include "transformations.h"
 #include "tiny_obj_loader.h"
 #include <stdexcept> // Add this include directive at the top of the file to fix the error
 #include <unordered_map>
@@ -14,9 +13,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds);
-void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float posX, float posY, float posZ, int orientation, float scaleX, float scaleZ);
+void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds)
+;
 void readValues(int i, std::string s, std::vector<float>& vec);
+
 void buildSphere(std::vector<float>& vertices, std::vector<unsigned int>& indices, float radius, int sectorCount = 24, int stackCount = 16);
 
 struct Segment {

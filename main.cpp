@@ -34,7 +34,6 @@ std::vector<glm::vec3> lightPositions = {
 };
 
 
-
 int main() {
    //wektory do przechowywania wierzcholków - osobno dla pokoju jak i dla każdego rodzaju mabla aby nie było syfu!
     std::vector<float> vertices;

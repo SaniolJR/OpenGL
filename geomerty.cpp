@@ -1,5 +1,6 @@
 ﻿#include "geometry.h"
 
+//funkcja ładująca vektory dla pokoju
 void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds) {
     unsigned int liczba_start = verts.size() / 8;
     // Ka�da �ciana: 4 wierzcho�ki = 4 x (x, y, z, u, v, nx, ny, nz)
@@ -64,59 +65,7 @@ void buildRoom(std::vector<float>& verts, std::vector<unsigned int>& inds) {
    
 }
 
-void buildBed(std::vector<float>& verts, std::vector<unsigned int>& inds, float posX, float posY, float posZ, int orientation, float scaleX, float scaleZ) {
-    unsigned int liczba_start = verts.size() / 8;
-
-    float bed_vert[] = {
-        // blat ��ka (normalna 0,1,0)
-        -1.5f, 0.3f, 1.5f,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-         1.5f, 0.3f, 1.5f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-         1.5f, 0.3f, 3.5f,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f,
-        -1.5f, 0.3f, 3.5f,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f,
-
-        // noga 1
-        -1.5f, 0.0f, 1.5f,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-        -1.4f, 0.0f, 1.5f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-        -1.4f, 0.3f, 1.5f,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f,
-        -1.5f, 0.3f, 1.5f,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f,
-
-        // noga 2
-         1.4f, 0.0f, 1.5f,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-         1.5f, 0.0f, 1.5f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-         1.5f, 0.3f, 1.5f,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f,
-         1.4f, 0.3f, 1.5f,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f,
-
-         // noga 3
-         -1.5f, 0.0f, 3.5f,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-         -1.4f, 0.0f, 3.5f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-         -1.4f, 0.3f, 3.5f,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f,
-         -1.5f, 0.3f, 3.5f,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f,
-
-         // noga 4
-          1.4f, 0.0f, 3.5f,  0.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-          1.5f, 0.0f, 3.5f,  1.0f, 0.0f,  0.0f, 1.0f, 0.0f,
-          1.5f, 0.3f, 3.5f,  1.0f, 1.0f,  0.0f, 1.0f, 0.0f,
-          1.4f, 0.3f, 3.5f,  0.0f, 1.0f,  0.0f, 1.0f, 0.0f
-    };
-
-    transformBedVertices8(bed_vert, 20, posX, posY, posZ, orientation, scaleX, scaleZ);
-
-    unsigned int bed_ind[] = {
-        0,1,2,0,2,3,       // blat
-        4,5,6,4,6,7,       // noga 1
-        8,9,10,8,10,11,    // noga 2
-        12,13,14,12,14,15, // noga 3
-        16,17,18,16,18,19  // noga 4
-    };
-
-    for (int i = 0; i < 30; i++) {
-        bed_ind[i] += liczba_start;
-    }
-
-    verts.insert(verts.end(), std::begin(bed_vert), std::end(bed_vert));
-    inds.insert(inds.end(), std::begin(bed_ind), std::end(bed_ind));
-}
-
+//funkcja pomocnicza do czytania wartości z linii tekstu
 void readValues(int i, std::string line, std::vector<float>& vec) {
     std::string val;
 
@@ -138,6 +87,7 @@ void readValues(int i, std::string line, std::vector<float>& vec) {
     }
 }
 
+//funkajca ładująca vektory dla obiektow z plików .obj 
 void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, const std::string& path, std::vector<Segment>& segments, float x, float y, float z, float scale) {
     std::ifstream in(path, std::ios::in);
     if (!in) {
@@ -155,6 +105,7 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
     std::string currentMtl = "default", prevMtl = currentMtl;
     int segStart = vertOffset;
 
+    //głowne zczytywanie
     while (std::getline(in, line)) {
 
         std::string type;
@@ -242,13 +193,14 @@ void parseFromObj(std::vector<float>& verts, std::vector<unsigned int>& inds, co
             }
 
         }
-        
+
     }
     if (vertOffset - segStart > 0) {
         segments.push_back({ prevMtl, segStart, vertOffset - segStart });
     }
 
 }
+
 
 // obraca same pozycje (x,y,z) w twoim danym wektorze verts o podane kąty w stopniach
 void rotateVertices( std::vector<float>& verts, float angleX, float angleY, float angleZ) {
@@ -268,6 +220,8 @@ void rotateVertices( std::vector<float>& verts, float angleX, float angleY, floa
     }
 }
 
+
+//funkcja do budowania sfery
 void buildSphere(std::vector<float>& vertices, std::vector<unsigned int>& indices, float radius, int sectorCount, int stackCount) {
     const float PI = 3.14159265359f;
     vertices.clear();
