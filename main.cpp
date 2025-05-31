@@ -176,8 +176,8 @@ int main() {
 
     //------------------------krzeslo x2
     std::vector<Segment> krzesloSeg;
-    parseFromObj(verticeskrzeslo, indiceskrzeslo, "krzeslo.obj", krzesloSeg, 7.5, 1.6, -3.5, 0.25);
-    parseFromObj(verticeskrzeslo, indiceskrzeslo, "krzeslo.obj", krzesloSeg, 5.5, 1.55, -3.5, 0.25);
+    parseFromObj(verticeskrzeslo, indiceskrzeslo, "krzeslo.obj", krzesloSeg, -3.75, 1.7, 3.5, 0.35);
+    parseFromObj(verticeskrzeslo, indiceskrzeslo, "krzeslo.obj", krzesloSeg, 3.75, 1.7, 3.5, 0.35);
 
     rotateVertices(verticeskrzeslo, 0.0f, 90.0f, 0.0f); // np. obrót stołu o 30° wokół Y
 
