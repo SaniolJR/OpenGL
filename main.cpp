@@ -59,7 +59,7 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-    GLFWwindow* window = glfwCreateWindow(width, height, "Pokoj z lozkiem", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(width, height, "MSadowski & SRydz - Akademik w Juwanalia", NULL, NULL);
     if (!window) {
         std::cerr << "Blad tworzenia okna GLFW" << std::endl;
         glfwTerminate();
@@ -210,8 +210,6 @@ int main() {
     { "przescieradlo", Texture("przescieradlo.png", GL_TEXTURE_2D, GL_TEXTURE0, GL_RGBA, GL_UNSIGNED_BYTE) }
     };
 
-
-  
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
